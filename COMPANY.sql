@@ -1,4 +1,4 @@
--- 6. Create TICKET Table
+-- Creating TICKET Table
 -- Note: R_E_id is the Requester (Employee), assigned_SA_id is the Agent.
 CREATE TABLE TICKET(
     T_id NUMBER(4) PRIMARY KEY,
@@ -16,28 +16,28 @@ CREATE TABLE TICKET(
     CONSTRAINT fk_ticket_dept FOREIGN KEY (D_number) REFERENCES DEPARTMENT(D_number)
 );
 
--- 7. Create ATTACHMENT Table (Weak Entity)
+-- Creating ATTACHMENT Table (Weak Entity)
 CREATE TABLE ATTACHMENT (
     A_file_name VARCHAR2(100),
     T_id NUMBER,
     A_file_type VARCHAR2(20),
-    A_upload_date DATE DEFAULT SYSDATE,
+    A_upload_date DATE,
     PRIMARY KEY (A_file_name, T_id),
     CONSTRAINT fk_attach_ticket FOREIGN KEY (T_id) REFERENCES TICKET(T_id)
 );
 
--- 8. Create KNOWLEDGE_BASE_ARTICLE Table
+-- Creating KNOWLEDGE_BASE_ARTICLE Table
 CREATE TABLE KNOWLEDGE_BASE_ARTICLE (
     KBA_id NUMBER PRIMARY KEY,
     KBA_title VARCHAR2(100) NOT NULL,
     KBA_content VARCHAR2(2000),
     KBA_category VARCHAR2(50),
-    KBA_created_date DATE DEFAULT SYSDATE,
+    KBA_created_date DATE,
     SA_id NUMBER NOT NULL,
     CONSTRAINT fk_kba_agent FOREIGN KEY (SA_id) REFERENCES SUPPORT_AGENT(SA_id)
 );
 
--- 9. Create TICKET_LINKED_TO_KBA Table (M:N Relationship)
+-- Creating TICKET_LINKED_TO_KBA Table (M:N Relationship)
 CREATE TABLE TICKET_LINKED_TO_KBA (
     T_id NUMBER,
     KBA_id NUMBER,
