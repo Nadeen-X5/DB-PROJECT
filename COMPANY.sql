@@ -1,3 +1,11 @@
+-- Creating DEPARTMENT Table.
+CREATE TABLE DEPARTMENT(
+D_number INTEGER   NOT NULL,
+D_name VARCHAR(15) NOT NULL,
+D_description VARCHAR(200) ,
+PRIMARY KEY(D_number),
+UNIQUE(D_name)
+);
 -- Creating EMPLOYEE Table.
 CREATE TABLE EMPLOYEE (
 E_id INTEGER     NOT NULL,
