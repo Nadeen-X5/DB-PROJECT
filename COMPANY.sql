@@ -1,3 +1,48 @@
+-- Creating DEPARTMENT Table.
+CREATE TABLE DEPARTMENT(
+D_number INTEGER   NOT NULL,
+D_name VARCHAR(15) NOT NULL,
+D_description VARCHAR(200) ,
+PRIMARY KEY(D_number),
+UNIQUE(D_name)
+);
+-- Creating EMPLOYEE Table.
+CREATE TABLE EMPLOYEE (
+E_id INTEGER     NOT NULL,
+F_name VARCHAR(15) NOT NULL,
+L_name VARCHAR(15) NOT NULL,
+email VARCHAR(50)     NOT NULL,
+phone VARCHAR(15)     NOT NULL,
+D_number INTEGER   NOT NULL,
+PRIMARY KEY(E_id),
+UNIQUE(email),
+UNIQUE(phone),
+FOREIGN KEY(D_number) REFERENCES DEPARTMENT(D_number)
+);
+-- Creating CUSTOMER Table.
+CREATE TABLE CUSTOMER(
+E_id INTEGER NOT NULL,
+organization VARCHAR(50),
+PRIMARY KEY(E_id),
+FOREIGN KEY(E_id) REFERENCES EMPLOYEE(E_id)
+);
+-- Creating SUPPORT_AGENT Table.
+CREATE TABLE SUPPORT_AGENT(
+E_id INTEGER NOT NULL,
+role VARCHAR(20) NOT NULL,
+PRIMARY KEY(E_id),
+FOREIGN KEY(E_id) REFERENCES EMPLOYEE(E_id)
+);
+-- Creating SA_SKILLS Table. multi valued attrbute for support agent
+CREATE TABLE SA_SKILLS(
+SA_id INTEGER NOT NULL,
+skill VARCHAR(30) NOT NULL,
+PRIMARY KEY(SA_id,skill),
+FOREIGN KEY(SA_id) REFERENCES SUPPORT_AGENT(E_id)
+);
+
+
+
 -- Creating TICKET Table
 -- Note: R_E_id is the Requester (Employee), assigned_SA_id is the Agent.
 CREATE TABLE TICKET(
@@ -12,14 +57,14 @@ CREATE TABLE TICKET(
     assigned_SA_id NUMBER NOT NULL,
     D_number NUMBER NOT NULL,
     CONSTRAINT fk_ticket_requester FOREIGN KEY (R_E_id) REFERENCES EMPLOYEE(E_id),
-    CONSTRAINT fk_ticket_agent FOREIGN KEY (assigned_SA_id) REFERENCES SUPPORT_AGENT(SA_id),
+    CONSTRAINT fk_ticket_agent FOREIGN KEY (assigned_SA_id) REFERENCES SUPPORT_AGENT(E_id),
     CONSTRAINT fk_ticket_dept FOREIGN KEY (D_number) REFERENCES DEPARTMENT(D_number)
 );
 
 -- Creating ATTACHMENT Table (Weak Entity)
 CREATE TABLE ATTACHMENT (
-    A_file_name VARCHAR2(100),
-    T_id NUMBER,
+    A_file_name VARCHAR2(100) NOT NULL,
+    T_id NUMBER NOT NULL,
     A_file_type VARCHAR2(20),
     A_upload_date DATE,
     PRIMARY KEY (A_file_name, T_id),
@@ -34,7 +79,7 @@ CREATE TABLE KNOWLEDGE_BASE_ARTICLE (
     KBA_category VARCHAR2(50),
     KBA_created_date DATE,
     SA_id NUMBER NOT NULL,
-    CONSTRAINT fk_kba_agent FOREIGN KEY (SA_id) REFERENCES SUPPORT_AGENT(SA_id)
+    CONSTRAINT fk_kba_agent FOREIGN KEY (SA_id) REFERENCES SUPPORT_AGENT(E_id)
 );
 
 -- Creating TICKET_LINKED_TO_KBA Table. The (M:N Relationship)
