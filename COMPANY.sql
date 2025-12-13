@@ -181,6 +181,101 @@ INSERT INTO TICKET_LINKED_TO_KBA VALUES (1003, 504);
 INSERT INTO TICKET_LINKED_TO_KBA VALUES (1001, 505);
 
 
+-------------------------------------------------------
+--              CREATE VIEWS 
+-------------------------------------------------------
+
+--View 1: TICKET_SUMMARY_VIEW Description: This view joins the Ticket table with Employees (Requester)
+--         and Support Agents to give a readable summary of all tickets, showing names instead of IDs.
+
+CREATE VIEW TICKET_SUMMARY_VIEW(E_Name, T_Title, T_Description, SA_Name) AS
+SELECT 
+    e.F_name, t.T_title, t.T_description, sa_emp.F_name
+FROM 
+      TICKET t
+    JOIN EMPLOYEE e
+        ON t.R_E_id = e.E_id
+    JOIN SUPPORT_AGENT sa
+        ON t.assigned_SA_id = sa.E_id
+    JOIN EMPLOYEE sa_emp
+        ON sa.E_id = sa_emp.E_id;
+
+
+--View 2: AGENT_PERFORMANCE_VIEW Description: This view shows how many tickets each agent has handled.
+   
+CREATE VIEW AGENT_PERFORMANCE_VIEW(Agent_Name, No_Of_Teckit) AS
+SELECT 
+    e.F_name, COUNT(*)
+FROM 
+    SUPPORT_AGENT sa
+    JOIN TICKET t ON sa.E_id = t.assigned_SA_id
+    LEFT JOIN EMPLOYEE e ON e.E_id = sa.E_id
+GROUP BY 
+     e.F_name;
+  
+     SELECT *
+     FROM AGENT_PERFORMANCE_VIEW;
 
 
 
+-------------------------------------------------------
+--              CREATE ALL QUERIES 
+-------------------------------------------------------
+
+--Query 1: List all "Critical" priority tickets that are currently "Open".
+
+SELECT c_emp.F_name AS C_Name, t.T_title, t.T_priority, sa_emp.F_name AS SA_Name, t.T_status
+FROM TICKET t
+JOIN EMPLOYEE c_emp
+    ON t.R_E_id = c_emp.E_id
+JOIN SUPPORT_AGENT  sa
+    ON sa.E_id =  t.assigned_SA_id
+JOIN EMPLOYEE sa_emp
+    ON sa_emp.E_id = sa.E_id
+WHERE t.T_status = 'Open' AND T_priority = 'Critical';
+
+
+--Query 2: Find all tickets requested by customers in the "IT" department.
+
+SELECT c_emp.F_name AS C_Name, t.T_title, d.D_name
+FROM TICKET t
+JOIN DEPARTMENT d
+    ON t.D_number = d.D_number
+JOIN EMPLOYEE c_emp
+    ON c_emp.E_id = t.R_E_id
+WHERE d.D_name = 'IT';
+
+--Query 3: List details of tickets that have attachments.
+
+SELECT  t.T_id,
+        t.T_title ,
+        t.T_status ,
+        t.T_priority ,
+        t.T_create_date ,
+        t.T_resolution_date ,
+        c_emp.F_name AS C_Name,
+        sa_emp.F_name AS SA_Name ,
+        t.D_number,
+        a.A_file_name
+FROM TICKET t
+JOIN ATTACHMENT a 
+    ON t.T_id = a.T_id
+JOIN EMPLOYEE c_emp
+    ON c_emp.E_id = t.R_E_id
+JOIN SUPPORT_AGENT  sa
+    ON sa.E_id =  t.assigned_SA_id
+JOIN EMPLOYEE sa_emp
+    ON sa_emp.E_id = sa.E_id;
+
+-- Query 4: Find Knowledge Base Articles created after Jan 1st, 2025.
+
+SELECT KBA_id, KBA_title, KBA_category
+FROM KNOWLEDGE_BASE_ARTICLE
+WHERE KBA_created_date > TO_DATE('2025-01-01', 'YYYY-MM-DD');
+
+-- Query 5: Count how many tickets each Department has generated.
+
+SELECT d.D_name, COUNT(t.T_id)
+FROM DEPARTMENT d
+LEFT JOIN TICKET t ON d.D_number = t.D_number
+GROUP BY d.D_name;
